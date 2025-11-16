@@ -1,0 +1,94 @@
+{
+  "name": "Branch Protection Settings",
+  "description": "Recommended branch protection configuration for main branch",
+  "settings": {
+    "branch": "main",
+    "protection": {
+      "required_status_checks": {
+        "strict": true,
+        "contexts": [
+          "quality / Code Quality",
+          "build / Build (20)",
+          "test / Test (ubuntu-latest, 20)",
+          "security / Security Audit",
+          "all-checks / All Checks Passed"
+        ]
+      },
+      "enforce_admins": false,
+      "required_pull_request_reviews": {
+        "dismissal_restrictions": {
+          "users": [],
+          "teams": []
+        },
+        "dismiss_stale_reviews": true,
+        "require_code_owner_reviews": true,
+        "required_approving_review_count": 1,
+        "require_last_push_approval": false,
+        "bypass_pull_request_allowances": {
+          "users": ["mohamed-elkholy95"],
+          "teams": []
+        }
+      },
+      "restrictions": {
+        "users": ["mohamed-elkholy95"],
+        "teams": [],
+        "apps": []
+      },
+      "required_linear_history": true,
+      "allow_force_pushes": false,
+      "allow_deletions": false,
+      "block_creations": false,
+      "required_conversation_resolution": true,
+      "lock_branch": false,
+      "allow_fork_syncing": true
+    }
+  },
+  "instructions": {
+    "manual_setup": "Follow BRANCH_PROTECTION.md for step-by-step instructions",
+    "api_setup": "Use GitHub API to apply these settings programmatically",
+    "note": "Status checks will only appear after running at least once"
+  },
+  "additional_repository_settings": {
+    "merge_options": {
+      "allow_merge_commit": false,
+      "allow_squash_merge": true,
+      "allow_rebase_merge": true,
+      "allow_auto_merge": true,
+      "delete_branch_on_merge": true,
+      "allow_update_branch": true,
+      "squash_merge_commit_title": "PR_TITLE",
+      "squash_merge_commit_message": "PR_BODY"
+    },
+    "security": {
+      "enable_automated_security_fixes": true,
+      "enable_vulnerability_alerts": true,
+      "enable_dependabot_security_updates": true
+    }
+  },
+  "verification_tests": [
+    {
+      "test": "Try to push directly to main",
+      "expected": "Should be rejected",
+      "command": "git push origin main"
+    },
+    {
+      "test": "Try to delete main branch",
+      "expected": "Should be rejected",
+      "command": "git push origin --delete main"
+    },
+    {
+      "test": "Try to force push to main",
+      "expected": "Should be rejected",
+      "command": "git push --force origin main"
+    },
+    {
+      "test": "Create PR without passing checks",
+      "expected": "Cannot merge",
+      "action": "Create PR, verify checks required"
+    }
+  ],
+  "emergency_contacts": {
+    "repository_admin": "mohamed-elkholy95",
+    "bypass_procedures": "See BRANCH_PROTECTION.md - Emergency Procedures section"
+  }
+}
