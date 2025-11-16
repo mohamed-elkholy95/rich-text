@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Rich Text Editor - Advanced Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .badge.blue {
+      background: #2196F3;
+    }
+
+    .badge.orange {
+      background: #FF9800;
+    }
+
+    .editor-section {
+      background: white;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .editor {
+      min-height: 300px;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .editor:focus {
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .editor[data-placeholder]:empty:before {
+      content: attr(data-placeholder);
+      color: #999;
+      font-style: italic;
+    }
+
+    /* Placeholder extension styles */
+    .mrte-placeholder::before,
+    .mrte-placeholder-relative::before {
+      content: attr(data-placeholder);
+      color: #999;
+      font-style: italic;
+      pointer-events: none;
+    }
+
+    .mrte-placeholder::before {
+      position: absolute;
+    }
+
+    .mrte-placeholder-relative::before {
+      position: relative;
+    }
+
+    .controls {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 0 0 12px 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    button.danger {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .output {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .output pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .info-card h3 {
+      font-size: 14px;
+      color: #667eea;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .info-card p {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .shortcuts {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .shortcuts h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .shortcut {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .shortcut:last-child {
+      border-bottom: none;
+    }
+
+    .key {
+      background: #f5f5f5;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      border: 1px solid #ddd;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container > * {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 Modern Rich Text Editor</h1>
+      <p class="subtitle">Advanced Demo with Extensions</p>
+      <div>
+        <span class="badge">TypeScript</span>
+        <span class="badge blue">Extensible</span>
+        <span class="badge orange">Framework-Agnostic</span>
+      </div>
+    </div>
+
+    <div class="editor-section">
+      <div id="editor" class="editor">
+        <h2>Welcome to the Modern Rich Text Editor!</h2>
+        <p>This is an advanced demo showcasing all the features:</p>
+        <ul>
+          <li><strong>Auto-linking</strong> - Try typing: www.example.com or https://github.com</li>
+          <li><strong>Keyboard shortcuts</strong> - Use Ctrl/Cmd+B for bold, Ctrl/Cmd+I for italic</li>
+          <li><strong>Placeholder support</strong> - Clear the editor to see the placeholder</li>
+          <li><strong>Command system</strong> - Use buttons below for formatting</li>
+        </ul>
+        <p>Type away and explore! ✨</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button onclick="execCmd('bold')"><strong>B</strong> Bold</button>
+      <button onclick="execCmd('italic')"><em>I</em> Italic</button>
+      <button onclick="execCmd('underline')"><u>U</u> Underline</button>
+      <button onclick="execCmd('strikeThrough')"><s>S</s> Strike</button>
+      <button class="secondary" onclick="execCmd('h1')">H1</button>
+      <button class="secondary" onclick="execCmd('h2')">H2</button>
+      <button class="secondary" onclick="execCmd('h3')">H3</button>
+      <button class="secondary" onclick="execCmd('insertUnorderedList')">• List</button>
+      <button class="secondary" onclick="execCmd('insertOrderedList')">1. List</button>
+      <button class="secondary" onclick="execCmd('blockquote')">❝ Quote</button>
+      <button class="secondary" onclick="getContent()">📄 Get HTML</button>
+      <button class="secondary" onclick="serialize()">💾 Serialize</button>
+      <button class="danger" onclick="clearEditor()">🗑️ Clear</button>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>📦 Extensions Loaded</h3>
+        <p id="extensions-info">Loading...</p>
+      </div>
+      <div class="info-card">
+        <h3>⌨️ Keyboard Commands</h3>
+        <p>3 shortcuts registered</p>
+      </div>
+      <div class="info-card">
+        <h3>🔗 Auto-Linking</h3>
+        <p>Active on Space/Enter</p>
+      </div>
+      <div class="info-card">
+        <h3>📝 Content Length</h3>
+        <p id="content-length">0 characters</p>
+      </div>
+    </div>
+
+    <div class="shortcuts">
+      <h2>⌨️ Keyboard Shortcuts</h2>
+      <div class="shortcut">
+        <span>Bold</span>
+        <span class="key">Ctrl/Cmd + B</span>
+      </div>
+      <div class="shortcut">
+        <span>Italic</span>
+        <span class="key">Ctrl/Cmd + I</span>
+      </div>
+      <div class="shortcut">
+        <span>Underline</span>
+        <span class="key">Ctrl/Cmd + U</span>
+      </div>
+    </div>
+
+    <div id="output" class="output" style="display: none;">
+      <strong>Output:</strong>
+      <pre id="output-content"></pre>
+    </div>
+  </div>
+
+  <script type="module">
+    console.log('%c🚀 Modern Rich Text Editor Demo', 'font-size: 20px; color: #667eea; font-weight: bold;');
+    console.log('Loading editor module...');
+
+    // Global functions for demo buttons
+    window.execCmd = function(command) {
+      if (window.editorInstance) {
+        window.editorInstance.execCommand(command);
+        console.log('✓ Executed command:', command);
+      } else {
+        document.execCommand(command, false);
+      }
+    };
+
+    window.getContent = function() {
+      const outputEl = document.getElementById('output');
+      const contentEl = document.getElementById('output-content');
+
+      if (window.editorInstance) {
+        const content = window.editorInstance.getContent();
+        contentEl.textContent = Array.isArray(content) ? content[0] : content;
+      } else {
+        contentEl.textContent = document.getElementById('editor').innerHTML;
+      }
+
+      outputEl.style.display = 'block';
+    };
+
+    window.serialize = function() {
+      const outputEl = document.getElementById('output');
+      const contentEl = document.getElementById('output-content');
+
+      if (window.editorInstance) {
+        const serialized = window.editorInstance.serialize();
+        contentEl.textContent = JSON.stringify(serialized, null, 2);
+      } else {
+        contentEl.textContent = 'Editor not initialized';
+      }
+
+      outputEl.style.display = 'block';
+    };
+
+    window.clearEditor = function() {
+      if (window.editorInstance) {
+        window.editorInstance.setContent('');
+      } else {
+        document.getElementById('editor').innerHTML = '';
+      }
+      document.getElementById('output').style.display = 'none';
+    };
+
+    // Try to initialize editor
+    import('../dist/index.js')
+      .then(module => {
+        const {
+          Editor,
+          PlaceholderExtension,
+          KeyboardCommandsExtension,
+          AutoLinkExtension
+        } = module;
+
+        console.log('✓ Editor module loaded');
+
+        // Initialize editor with extensions
+        window.editorInstance = new Editor('#editor', {
+          placeholder: 'Start typing your masterpiece...',
+          spellcheck: true,
+          onChange: (content) => {
+            const length = content.replace(/<[^>]*>/g, '').length;
+            document.getElementById('content-length').textContent = `${length} characters`;
+          },
+          extensions: {
+            placeholder: new PlaceholderExtension({
+              text: 'Start typing your masterpiece...',
+              hideOnClick: true
+            }),
+            keyboard: new KeyboardCommandsExtension(),
+            autoLink: new AutoLinkExtension()
+          }
+        });
+
+        console.log('✓ Editor initialized with extensions');
+        console.log('✓ Available commands:', window.editorInstance.commands.getCommandNames());
+
+        // Update extensions info
+        const plugins = window.editorInstance.plugins.getPluginNames();
+        document.getElementById('extensions-info').textContent =
+          plugins.length > 0 ? plugins.join(', ') : 'None';
+
+        // Initial content length
+        const initialLength = document.getElementById('editor').textContent.length;
+        document.getElementById('content-length').textContent = `${initialLength} characters`;
+      })
+      .catch(err => {
+        console.error('Failed to load editor module:', err);
+        console.log('💡 Build the project first: npm install && npm run build');
+
+        document.getElementById('extensions-info').textContent = 'Build required';
+
+        // Make editor contenteditable anyway
+        document.getElementById('editor').setAttribute('contenteditable', 'true');
+      });
+  </script>
+</body>
+</html>
