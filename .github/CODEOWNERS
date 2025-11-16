@@ -1,0 +1,35 @@
+# Code Owners
+# This file defines individuals or teams that are responsible for code in this repository.
+
+# Default owners for everything in the repo
+* @mohamed-elkholy95
+
+# Core functionality
+/src/core/ @mohamed-elkholy95
+/src/dom/ @mohamed-elkholy95
+
+# Extensions
+/src/extensions/ @mohamed-elkholy95
+
+# Configuration files
+*.json @mohamed-elkholy95
+*.yml @mohamed-elkholy95
+*.yaml @mohamed-elkholy95
+*.config.* @mohamed-elkholy95
+
+# Documentation
+*.md @mohamed-elkholy95
+/docs/ @mohamed-elkholy95
+
+# GitHub specific
+/.github/ @mohamed-elkholy95
+
+# Tests
+/tests/ @mohamed-elkholy95
+*.spec.ts @mohamed-elkholy95
+*.test.ts @mohamed-elkholy95
+
+# Build and deployment
+/dist/ @mohamed-elkholy95
+package.json @mohamed-elkholy95
+package-lock.json @mohamed-elkholy95

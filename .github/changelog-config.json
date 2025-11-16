@@ -1,0 +1,60 @@
+{
+  "categories": [
+    {
+      "title": "## 🚀 Features",
+      "labels": ["feature", "enhancement"]
+    },
+    {
+      "title": "## 🐛 Bug Fixes",
+      "labels": ["bug", "fix"]
+    },
+    {
+      "title": "## 📝 Documentation",
+      "labels": ["documentation", "docs"]
+    },
+    {
+      "title": "## 🎨 Styling",
+      "labels": ["style", "design"]
+    },
+    {
+      "title": "## ♻️ Code Refactoring",
+      "labels": ["refactor", "refactoring"]
+    },
+    {
+      "title": "## ⚡️ Performance Improvements",
+      "labels": ["performance", "optimization"]
+    },
+    {
+      "title": "## ✅ Tests",
+      "labels": ["test", "testing"]
+    },
+    {
+      "title": "## 🔧 Build & CI",
+      "labels": ["build", "ci", "github-actions"]
+    },
+    {
+      "title": "## 📦 Dependencies",
+      "labels": ["dependencies", "deps"]
+    },
+    {
+      "title": "## 🔒 Security",
+      "labels": ["security", "vulnerability"]
+    },
+    {
+      "title": "## 💥 Breaking Changes",
+      "labels": ["breaking-change", "breaking"]
+    }
+  ],
+  "ignore_labels": [
+    "duplicate",
+    "invalid",
+    "wontfix",
+    "question"
+  ],
+  "sort": "ASC",
+  "template": "${{CHANGELOG}}\n\n**Full Changelog**: ${{RELEASE_DIFF}}",
+  "pr_template": "- ${{TITLE}} (#${{NUMBER}})",
+  "empty_template": "- No changes",
+  "max_pull_requests": 200,
+  "max_back_track_time_days": 365
+}

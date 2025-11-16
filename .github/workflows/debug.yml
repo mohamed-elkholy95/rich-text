@@ -1,0 +1,142 @@
+name: Debug Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Enable debug mode'
+        required: false
+        type: boolean
+        default: true
+      log_level:
+        description: 'Log level'
+        required: false
+        type: choice
+        options:
+          - debug
+          - info
+          - warning
+          - error
+        default: debug
+
+jobs:
+  debug-build:
+    name: Debug Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup tmate session (Remote SSH Debugging)
+        if: ${{ inputs.debug_enabled }}
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        with:
+          limit-access-to-actor: true
+
+      - name: Install dependencies
+        run: |
+          echo "::group::Installing dependencies"
+          npm ci --verbose
+          echo "::endgroup::"
+
+      - name: List installed packages
+        run: |
+          echo "::group::Installed packages"
+          npm list --depth=0
+          echo "::endgroup::"
+
+      - name: Debug environment
+        run: |
+          echo "::group::Environment Information"
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "Working directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "::endgroup::"
+
+      - name: Run type check with verbose output
+        run: |
+          echo "::group::TypeScript Type Check"
+          npm run typecheck -- --verbose
+          echo "::endgroup::"
+
+      - name: Run linting with verbose output
+        run: |
+          echo "::group::ESLint"
+          npm run lint -- --debug
+          echo "::endgroup::"
+
+      - name: Run tests with debug output
+        run: |
+          echo "::group::Running Tests"
+          npm test -- --run --reporter=verbose
+          echo "::endgroup::"
+
+      - name: Build with verbose output
+        run: |
+          echo "::group::Building Project"
+          npm run build -- --debug
+          echo "::endgroup::"
+
+      - name: Analyze build output
+        run: |
+          echo "::group::Build Output Analysis"
+          echo "Dist directory contents:"
+          find dist -type f -exec sh -c 'echo "{}: $(wc -c < {} | numfmt --to=iec-i --suffix=B)"' \;
+          echo ""
+          echo "Total build size:"
+          du -sh dist
+          echo "::endgroup::"
+
+      - name: Create debug report
+        if: always()
+        run: |
+          cat > debug-report.md << 'EOF'
+          # Debug Build Report
+
+          ## Environment
+          - Node: $(node --version)
+          - npm: $(npm --version)
+          - OS: ${{ runner.os }}
+          - Workflow: ${{ github.workflow }}
+          - Run ID: ${{ github.run_id }}
+
+          ## Build Status
+          - Type Check: ${{ job.status }}
+          - Lint: ${{ job.status }}
+          - Tests: ${{ job.status }}
+          - Build: ${{ job.status }}
+
+          ## Timestamps
+          - Started: ${{ github.event.created_at }}
+          - Completed: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+
+      - name: Upload debug report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-report
+          path: debug-report.md
+          retention-days: 7
+
+      - name: Upload full logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-logs
+          path: |
+            npm-debug.log*
+            *.log
+          retention-days: 7
+          if-no-files-found: ignore
