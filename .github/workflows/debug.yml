@@ -124,7 +124,7 @@ jobs:
 
       - name: Upload debug report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debug-report
           path: debug-report.md
@@ -132,7 +132,7 @@ jobs:
 
       - name: Upload full logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debug-logs
           path: |
